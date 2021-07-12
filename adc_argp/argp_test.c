@@ -8,9 +8,13 @@ int main(int argc, const char *argv[]) {
         unsigned int winscale = 1;
 
         adc_argp_option options[] = {
-            {"fullscreen", "f", ADC_ARGP_TYPE_FLAG, &fullscreen},
-            {"configdir", "d", ADC_ARGP_TYPE_STRING, &configdir},
-            {"winscale", "s", ADC_ARGP_TYPE_UINT, &winscale},
+            ADC_ARGP_HELP(),
+            ADC_ARGP_OPTION("fullscreen", "f", ADC_ARGP_TYPE_FLAG, &fullscreen,
+                            "Enable fullscreen mode"),
+            ADC_ARGP_OPTION("configdir", "d", ADC_ARGP_TYPE_STRING, &configdir,
+                            "Set the config directory"),
+            ADC_ARGP_OPTION("winscale", "s", ADC_ARGP_TYPE_UINT, &winscale,
+                            "Set the window scale factor"),
         };
         // const char *argv[] = {"adc_argp_test", "--flag", "--str",
         // "helloworld",
@@ -21,9 +25,8 @@ int main(int argc, const char *argv[]) {
         if (!parser)
                 return -1;
 
-        if (adc_argp_parse(parser, argc, argv) > 0) {
+        if (adc_argp_parse(parser, argc, argv) > 0)
                 adc_argp_print_errors(parser, stderr);
-        }
 
         printf("fullscreen: %d\n", fullscreen);
         printf("configdir: %s\n", configdir);

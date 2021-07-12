@@ -8,6 +8,7 @@
 #define ADC_ARGP_VERSION "0.1.0"
 
 typedef enum {
+        ADC_ARGP_TYPE_HELP,
         ADC_ARGP_TYPE_FLAG,
         ADC_ARGP_TYPE_BOOL,
         ADC_ARGP_TYPE_STRING,
@@ -23,7 +24,16 @@ typedef struct {
         const char *shortname;
         adc_argp_type valtype;
         void *val;
+        const char *desc;
 } adc_argp_option;
+
+#define ADC_ARGP_OPTION(name, sname, type, val, desc)                          \
+        (adc_argp_option) {                                                    \
+                (name), (sname), (type), (val), (desc)                         \
+        }
+#define ADC_ARGP_HELP()                                                        \
+        ADC_ARGP_OPTION("help", "h", ADC_ARGP_TYPE_HELP, NULL,                 \
+                        "Print usage information")
 
 typedef struct adc_argp_parser adc_argp_parser;
 

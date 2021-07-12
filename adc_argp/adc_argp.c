@@ -28,7 +28,7 @@
 
 #include <errno.h>  // For errno global
 #include <stdlib.h> // For malloc, free
-#include <string.h> // For strcmp
+#include <string.h> // For strcmp, strchr, strtol, strtoul, strtof, strtod
 
 // For arithmetic range and underflow checks
 #include <float.h>
@@ -72,6 +72,7 @@ typedef struct {
 } error;
 
 struct adc_argp_parser {
+        const char *progname;
         adc_argp_option *opts;
         unsigned int opts_len;
         // Statically allocate a fixed array of errors (32 by default). It's
@@ -91,14 +92,24 @@ static int parse_double(double *out, const char *argv);
 static void add_error(adc_argp_parser *parser, error_type type,
                       const adc_argp_option *opt, const char *argv);
 
+void print_help(adc_argp_parser *parser);
+
 adc_argp_parser *adc_argp_new_parser(adc_argp_option *opts,
                                      unsigned int opts_len) {
         ADC_ARGP_ASSERT(opts);
+        for (int i = 0; i < opts_len; i++) {
+                ADC_ARGP_ASSERT(opts[i].name);
+                ADC_ARGP_ASSERT(opts[i].shortname);
+                ADC_ARGP_ASSERT(opts[i].valtype >= 0 &&
+                                opts[i].valtype < ADC_ARGP_TYPE_MAX);
+                ADC_ARGP_ASSERT(opts[i].desc);
+        }
 
         adc_argp_parser *parser = ADC_ARGP_MALLOC(sizeof(*parser));
         if (!parser)
                 return NULL;
 
+        parser->progname = NULL;
         parser->opts = opts;
         parser->opts_len = opts_len;
         parser->errors_len = 0;
@@ -127,6 +138,10 @@ int adc_argp_parse(adc_argp_parser *parser, int argc, const char *argv[]) {
         if (parser->opts_len == 0)
                 return 0;
 
+        // If we have a value present in argv[0], use it as the program name.
+        if (argv[0])
+                parser->progname = argv[0];
+
         for (int i = 1; i < argc; i++) {
                 int opt_index =
                     find_opt(argv[i], parser->opts, parser->opts_len);
@@ -139,6 +154,10 @@ int adc_argp_parse(adc_argp_parser *parser, int argc, const char *argv[]) {
                 error_type err = ERROR_NONE;
 
                 switch (opt->valtype) {
+                case ADC_ARGP_TYPE_HELP:
+                        print_help(parser);
+                        exit(EXIT_SUCCESS);
+                        break;
                 case ADC_ARGP_TYPE_FLAG: *((int *)(opt->val)) = 1; break;
                 case ADC_ARGP_TYPE_BOOL:
                         ARGV_NEXT();
@@ -176,7 +195,7 @@ int adc_argp_parse(adc_argp_parser *parser, int argc, const char *argv[]) {
         return parser->errors_len;
 }
 
-static const char *argp_type_str(adc_argp_type type) {
+static const char *argp_type_string(adc_argp_type type) {
         switch (type) {
         case ADC_ARGP_TYPE_FLAG: return "flag";
         case ADC_ARGP_TYPE_BOOL: return "bool";
@@ -215,7 +234,7 @@ void adc_argp_print_errors(adc_argp_parser *parser, FILE *stream) {
                         fprintf(
                             stream,
                             "Invalid %s with value '%s' for the --%s option\n",
-                            argp_type_str(err->opt->valtype), err->argv,
+                            argp_type_string(err->opt->valtype), err->argv,
                             err->opt->name);
                         break;
                 case ERROR_ARG_INVALID_BOOL:
@@ -241,7 +260,7 @@ void adc_argp_print_errors(adc_argp_parser *parser, FILE *stream) {
                         fprintf(stream,
                                 "Out of range %s with value '%s' for the --%s "
                                 "option\n",
-                                argp_type_str(err->opt->valtype), err->argv,
+                                argp_type_string(err->opt->valtype), err->argv,
                                 err->opt->name);
                         break;
                 case ERROR_ARG_UNDERFLOW:
@@ -250,7 +269,7 @@ void adc_argp_print_errors(adc_argp_parser *parser, FILE *stream) {
                         fprintf(stream,
                                 "Underflow has occurred in %s with value '%s' "
                                 "for the --%s option\n",
-                                argp_type_str(err->opt->valtype), err->argv,
+                                argp_type_string(err->opt->valtype), err->argv,
                                 err->opt->name);
                         break;
                 }
@@ -263,7 +282,6 @@ static int string_has_prefix(const char *str, const char *prefix) {
         ADC_ARGP_ASSERT(str);
         ADC_ARGP_ASSERT(prefix);
 
-        int i = 0;
         const char *strp = str;
         const char *prefixp = prefix;
         while (*prefixp != '\0') {
@@ -383,7 +401,7 @@ static int parse_double(double *out, const char *argv) {
 
         char *endptr;
         errno = 0;
-        float result = strtof(argv, &endptr);
+        float result = strtod(argv, &endptr);
 
         if (endptr == argv)
                 return ERROR_ARG_INVALID;
@@ -409,3 +427,22 @@ static void add_error(adc_argp_parser *parser, error_type type,
         parser->errors_len++;
 }
 
+void print_help(adc_argp_parser *parser) {
+        ADC_ARGP_ASSERT(parser);
+
+        fprintf(stdout, "%s usage:\n", parser->progname);
+
+        for (int i = 0; i < parser->opts_len; i++) {
+                const adc_argp_option *opt = &parser->opts[i];
+
+                // Options with type FLAG or HELP don't have an argument.
+                if (opt->valtype == ADC_ARGP_TYPE_FLAG ||
+                    opt->valtype == ADC_ARGP_TYPE_HELP)
+                        fprintf(stdout, "--%s (-%s): %s\n", opt->name,
+                                opt->shortname, opt->desc);
+                else
+                        fprintf(stdout, "--%s (-%s) <%s>: %s\n", opt->name,
+                                opt->shortname, argp_type_string(opt->valtype),
+                                opt->desc);
+        }
+}

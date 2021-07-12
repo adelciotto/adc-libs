@@ -14,9 +14,13 @@ int main(int argc, const char *argv[]) {
         unsigned int winscale = 1;
 
         adc_argp_option options[] = {
-            {"fullscreen", "f", ADC_ARGP_TYPE_FLAG, &fullscreen},
-            {"configdir", "d", ADC_ARGP_TYPE_STRING, &configdir},
-            {"winscale", "s", ADC_ARGP_TYPE_UINT, &winscale},
+            ADC_ARGP_HELP(),
+            ADC_ARGP_OPTION("fullscreen", "f", ADC_ARGP_TYPE_FLAG, &fullscreen,
+                            "Enable fullscreen mode"),
+            ADC_ARGP_OPTION("configdir", "d", ADC_ARGP_TYPE_STRING, &configdir,
+                            "Set the config directory"),
+            ADC_ARGP_OPTION("winscale", "s", ADC_ARGP_TYPE_UINT, &winscale,
+                            "Set the window scale factor"),
         };
 
         adc_argp_parser *parser =
