@@ -40,6 +40,10 @@ typedef struct adc_argp_parser adc_argp_parser;
 #define ADC_ARGP_COUNT(x)                                                      \
         ((sizeof(x) / sizeof(0 [x])) / ((size_t)(!(sizeof(x) % sizeof(0 [x])))))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // adc_argp_new_parser() - Create a new command line option parser.
 // opts - Array of options.
 // opts_len - The length of the opts array. Can use the ADC_ARGP_COUNT macro.
@@ -56,5 +60,9 @@ int adc_argp_parse(adc_argp_parser *parser, int argc, const char *argv[]);
 // adc_argp_print_errors() - Print any errors encountered during parsing to the
 // given FILE stream.
 void adc_argp_print_errors(adc_argp_parser *parser, FILE *stream);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _ADC_ARGP_H_

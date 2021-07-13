@@ -97,7 +97,7 @@ void print_help(adc_argp_parser *parser);
 adc_argp_parser *adc_argp_new_parser(adc_argp_option *opts,
                                      unsigned int opts_len) {
         ADC_ARGP_ASSERT(opts);
-        for (int i = 0; i < opts_len; i++) {
+        for (unsigned int i = 0; i < opts_len; i++) {
                 ADC_ARGP_ASSERT(opts[i].name);
                 ADC_ARGP_ASSERT(opts[i].shortname);
                 ADC_ARGP_ASSERT(opts[i].valtype >= 0 &&
@@ -185,6 +185,7 @@ int adc_argp_parse(adc_argp_parser *parser, int argc, const char *argv[]) {
                         ARGV_NEXT();
                         err = parse_double((double *)opt->val, argv[i]);
                         break;
+                default: break;
                 }
 
                 if (err != ERROR_NONE) {
@@ -214,7 +215,7 @@ void adc_argp_print_errors(adc_argp_parser *parser, FILE *stream) {
 
         fprintf(stream, "adc_argp_parse errors:\n");
 
-        for (int i = 0; i < parser->errors_len; i++) {
+        for (unsigned int i = 0; i < parser->errors_len; i++) {
                 const error *err = &parser->errors[i];
 
                 switch (err->type) {
@@ -272,6 +273,7 @@ void adc_argp_print_errors(adc_argp_parser *parser, FILE *stream) {
                                 argp_type_string(err->opt->valtype), err->argv,
                                 err->opt->name);
                         break;
+                default: break;
                 }
         }
 }
@@ -432,7 +434,7 @@ void print_help(adc_argp_parser *parser) {
 
         fprintf(stdout, "%s usage:\n", parser->progname);
 
-        for (int i = 0; i < parser->opts_len; i++) {
+        for (unsigned int i = 0; i < parser->opts_len; i++) {
                 const adc_argp_option *opt = &parser->opts[i];
 
                 // Options with type FLAG or HELP don't have an argument.
