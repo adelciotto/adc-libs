@@ -13,7 +13,7 @@
 #include <stdbool.h> // For the bool type
 #endif
 
-#define ADC_8080_CPU_VERSION "0.1.0"
+#define ADC_8080_CPU_VERSION "0.2.0"
 
 typedef struct {
         // 7 8-bit registers (accum and scratch).

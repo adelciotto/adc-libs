@@ -27,9 +27,9 @@
 #include <inttypes.h> // For PRIu8, PRIu16, etc
 
 // Allow override of assert.
-#ifndef ADC_8080_CPU_ASSERT
+#ifndef ADC_ASSERT
 #include <assert.h>
-#define ADC_8080_CPU_ASSERT(x) assert(x)
+#define ADC_ASSERT(x) assert(x)
 #endif
 
 // LUTs
@@ -104,7 +104,7 @@ static void exec_next(adc_8080_cpu *cpu, uint8_t opcode);
 // Public api implementation
 
 void adc_8080_cpu_init(adc_8080_cpu *cpu) {
-        ADC_8080_CPU_ASSERT(cpu);
+        ADC_ASSERT(cpu);
 
         // Init the cpu state to all zero values.
         cpu->ra = 0, cpu->rb = 0, cpu->rc = 0, cpu->rd = 0, cpu->re = 0,
@@ -134,11 +134,11 @@ void adc_8080_cpu_init(adc_8080_cpu *cpu) {
 }
 
 void adc_8080_cpu_step(adc_8080_cpu *cpu) {
-        ADC_8080_CPU_ASSERT(cpu);
-        ADC_8080_CPU_ASSERT(cpu->read_byte);
-        ADC_8080_CPU_ASSERT(cpu->write_byte);
-        ADC_8080_CPU_ASSERT(cpu->read_device);
-        ADC_8080_CPU_ASSERT(cpu->write_device);
+        ADC_ASSERT(cpu);
+        ADC_ASSERT(cpu->read_byte);
+        ADC_ASSERT(cpu->write_byte);
+        ADC_ASSERT(cpu->read_device);
+        ADC_ASSERT(cpu->write_device);
 
         // Recognize a interrupt request when all of the following
         // conditions are met:
@@ -161,7 +161,7 @@ void adc_8080_cpu_step(adc_8080_cpu *cpu) {
 }
 
 void adc_8080_cpu_interrupt(adc_8080_cpu *cpu, uint8_t opcode) {
-        ADC_8080_CPU_ASSERT(cpu);
+        ADC_ASSERT(cpu);
 
         cpu->interrupt_pending = true;
         cpu->interrupt_opcode = opcode;
@@ -174,8 +174,8 @@ void adc_8080_cpu_interrupt(adc_8080_cpu *cpu, uint8_t opcode) {
 void adc_8080_cpu_print(adc_8080_cpu *cpu, FILE *stream) {
 #define u8 "0x%02" PRIx8
 #define u16 "0x%04" PRIx16
-        ADC_8080_CPU_ASSERT(cpu);
-        ADC_8080_CPU_ASSERT(stream);
+        ADC_ASSERT(cpu);
+        ADC_ASSERT(stream);
 
         fprintf(stream,
                 "a:" u8 ", b:" u8 ", d:" u8 ", d:" u8 ", e:" u8 ", h:" u8
