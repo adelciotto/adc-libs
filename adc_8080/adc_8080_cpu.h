@@ -13,41 +13,43 @@
 #include <stdbool.h> // For the bool type
 #endif
 
-#define ADC_8080_CPU_VERSION "0.3.0"
+#define ADC_8080_CPU_VERSION_MAJOR 0
+#define ADC_8080_CPU_VERSION_MINOR 3
+#define ADC_8080_CPU_VERSION_PATCH 1
 
 typedef struct {
-        // 7 8-bit registers (accum and scratch).
-        uint8_t ra, rb, rc, rd, re, rh, rl;
+  // 7 8-bit registers (accum and scratch).
+  uint8_t ra, rb, rc, rd, re, rh, rl;
 
-        // 16-bit program counter.
-        uint16_t pc;
+  // 16-bit program counter.
+  uint16_t pc;
 
-        // 16-bit stack pointer.
-        uint16_t sp;
+  // 16-bit stack pointer.
+  uint16_t sp;
 
-        // Condition flags (sign, zero, aux, parity, carry).
-        bool cfs, cfz, cfa, cfp, cfc;
+  // Condition flags (sign, zero, aux, parity, carry).
+  bool cfs, cfz, cfa, cfp, cfc;
 
-        // Interrupt and halt state variables.
-        bool halted;
-        bool inte; // Interrupt Enable flip-flop
-        bool interrupt_pending;
-        uint8_t interrupt_opcode;
-        bool interrupt_delay;
+  // Interrupt and halt state variables.
+  bool halted;
+  bool inte; // Interrupt Enable flip-flop
+  bool interrupt_pending;
+  uint8_t interrupt_opcode;
+  bool interrupt_delay;
 
-        // Cycles the cpu has consumed.
-        uint64_t cycle_count;
+  // Cycles the cpu has consumed.
+  uint64_t cycle_count;
 
-        // Custom user data for function handlers.
-        void *userdata;
+  // Custom user data for function handlers.
+  void *userdata;
 
-        // Memory read and write function handlers.
-        uint8_t (*read_byte)(void *userdata, uint16_t addr);
-        void (*write_byte)(void *userdata, uint16_t addr, uint8_t val);
+  // Memory read and write function handlers.
+  uint8_t (*read_byte)(void *userdata, uint16_t addr);
+  void (*write_byte)(void *userdata, uint16_t addr, uint8_t val);
 
-        // Device read and write function handlers.
-        uint8_t (*read_device)(void *userdata, uint8_t device);
-        void (*write_device)(void *userdata, uint8_t device, uint8_t val);
+  // Device read and write function handlers.
+  uint8_t (*read_device)(void *userdata, uint8_t device);
+  void (*write_device)(void *userdata, uint8_t device, uint8_t val);
 } adc_8080_cpu;
 
 #ifdef __cpluscplus
