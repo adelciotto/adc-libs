@@ -3,6 +3,12 @@ adc_vector
 
 Generic dynamic array implementation similar to the C++ std::vector.
 
+All operations except `adc_vector_insert`, `adc_vector_erase` and `adc_vector_erasen` are O(1) amortized. The vector capacity is doubled as needed.
+
+For some of the functions (`adc_vector_erase`, `adc_vector_erasen`, `adc_vector_insert`) bounds checking is performed. This is not a performance optimized implementation.
+
+Credit to Sean T. Barrett and contributors of stb_ds.h. Some of that code is being used in this library.
+
 # Usage
 
 ```c

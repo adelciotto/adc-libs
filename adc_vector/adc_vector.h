@@ -1,8 +1,13 @@
 // adc_vector Vector data structure library by Anthony Del Ciotto.
 // Implements a dynamic array similar to the C++ std::vector.
 //
-// All operations except adc_vector_ins and adc_vector_del are O(1) amortized.
-// The dynamic array (vector) capacity is doubled as needed.
+// All operations except adc_vector_insert, adc_vector_erase and
+// adc_vector_erasen are O(1) amortized. The vector capacity is
+// doubled as needed.
+//
+// For some of the functions (adc_vector_erase, adc_vector_erasen,
+// adc_vector_insert) some bounds checking is performed. So this is not a
+// performance optimized implementation.
 //
 // Credit to Sean T. Barrett and contributors of stb_ds.h. Some of that code is
 // being used in this library.
@@ -61,9 +66,8 @@ extern "C" {
 // adc_vector_reserve() - Requests that the vector capacity be at least enough
 // to contain n items.
 //
-// If n is greater than the current vector capacity, the function causes the
-// container to reallocate its storage increasing its capacity to n (or
-// greater).
+// If n > capacity, the function causes the container to reallocate its storage
+// increasing its capacity to n (or greater).
 //
 // In all other cases, the function call does not cause a reallocation and the
 // vector capacity is not affected.
@@ -87,8 +91,8 @@ extern "C" {
 // Causes the vector to relocate all the items after i, so is a more inefficient
 // operation.
 //
-// If i is less then 0 no action is taken.
-// If i is greater or equal to the size of the vector then no action is taken.
+// If i < 0, no action is taken.
+// If i >= size, no action is taken.
 //
 // No return value.
 #define adc_vector_insert(vec, i, item)                                        \
@@ -114,18 +118,19 @@ extern "C" {
 // Causes the vector to relocate all the items after i, so is a more inefficient
 // operation.
 //
-// If i is less then 0 no action is taken.
-// If n is less then 0 no action is taken.
-// If i+n is greater or equal to the size of the vector then all items at
-// position >= i will be deleted.
+// If i < 0, no action is taken.
+// if i >= size, no action is taken.
+// If n is < 0 ,no action is taken.
+// If i+n >= size, then all items at position >= i will be deleted.
 //
 // No return value.
 #define adc_vector_erasen(vec, i, n)                                           \
   {                                                                            \
-    if ((vec) && (i) >= 0 && (n) >= 0) {                                       \
+    if ((vec) && ((i) >= 0 && (i) < adc_vector_get_header(vec)->size) &&       \
+        (n) >= 0) {                                                            \
       adc_vector_header *header = adc_vector_get_header(vec);                  \
       int maxn = (n);                                                          \
-      if ((i) + maxn >= header->size)                                          \
+      if ((size_t)((i) + maxn) >= header->size)                                \
         maxn = header->size - (i);                                             \
       size_t num = sizeof(*(vec)) * header->size - maxn - (i);                 \
       memmove(&(vec)[(i)], &(vec)[(i) + maxn], num);                           \

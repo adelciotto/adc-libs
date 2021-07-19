@@ -1,7 +1,7 @@
 adc libs
 ========================
 
-My collection of C libraries that I use in my personal projects.
+My collection of C99 libraries that I use in my personal projects.
 
 | Library      | Latest Version | Description                          |
 |--------------|----------------|--------------------------------------|
