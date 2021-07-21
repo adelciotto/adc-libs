@@ -1,18 +1,25 @@
 adc_8080
 ========================
 
-My Intel 8080 emulation library. At the moment it just includes the cpu emulator, but a disassembler will be added soon.
+My Intel 8080 emulation library. It includes an emulator (`adc_8080_cpu`) and disassembler (`adc_8080_dasm`).
 
 Refer to my [Space Invaders](https://github.com/adelciotto/SPACE_INVADERS) arcade emulator for a demonstration of this library.
 
 # Tests
 
-The CPU emulation is tested using existing diagnostic programs. The `8080_cpu_tests.c` file implements a test suite and sets up the CPU to run the test programs. It injects device write ops (OUT) at memory addresses where BDOS system calls are located so that the programs can print to stdout and exit the test suite.
-
-Compile and run the tests:
+Compile the tests:
 
 ```sh
 make
+```
+
+## Cpu
+
+The CPU emulation is tested using existing diagnostic programs. The `8080_cpu_tests.c` file implements a test suite and sets up the CPU to run the test programs. It injects device write ops (OUT) at memory addresses where BDOS system calls are located so that the programs can print to stdout and exit the test suite.
+
+Run the tests:
+
+```sh
 ./build/8080_cpu_test
 ```
 
@@ -24,9 +31,9 @@ You should see the following output to stdout:
 ##### Starting test 'roms/TST8080.COM'
 
 MICROCOSM ASSOCIATES 8080/8085 CPU DIAGNOSTIC
- VERSION 1.0  (C) 1980
+VERSION 1.0  (C) 1980
 
- CPU IS OPERATIONAL
+CPU IS OPERATIONAL
 
 ##### Test 'roms/TST8080.COM' passed!
 
@@ -84,4 +91,12 @@ Tests complete
 ##### Test 'roms/8080EXM.COM' passed!
 
 ########## 8080 CPU test finished!
+```
+
+## Disassembler
+
+Run the tests:
+
+```sh
+./build/8080_dasm_test
 ```
