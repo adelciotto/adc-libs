@@ -111,7 +111,7 @@ void adc_8080_cpu_init(adc_8080_cpu *cpu) {
   cpu->interrupt_pending = false;
   cpu->interrupt_opcode = 0x00;
   cpu->interrupt_delay = false;
-  cpu->cycle_count = 0;
+  cpu->cycles = 0;
   cpu->userdata = NULL;
   cpu->read_byte = NULL;
   cpu->write_byte = NULL;
@@ -128,7 +128,7 @@ void adc_8080_cpu_init(adc_8080_cpu *cpu) {
   }
 }
 
-void adc_8080_cpu_step(adc_8080_cpu *cpu) {
+uint64_t adc_8080_cpu_step(adc_8080_cpu *cpu) {
   assert(cpu);
   assert(cpu->read_byte);
   assert(cpu->write_byte);
@@ -153,6 +153,11 @@ void adc_8080_cpu_step(adc_8080_cpu *cpu) {
   } else if (!cpu->halted) {
     exec_next(cpu, next_byte(cpu));
   }
+
+  // Reset the cycle count and return the consumed cycles this step.
+  uint64_t cycles = cpu->cycles;
+  cpu->cycles = 0;
+  return cycles;
 }
 
 void adc_8080_cpu_interrupt(adc_8080_cpu *cpu, uint8_t opcode) {
@@ -179,12 +184,11 @@ void adc_8080_cpu_print(adc_8080_cpu *cpu, FILE *stream) {
           "pc:" u16 ", sp:" u16 "\n"
           "cfs:%d, cfz:%d, cfa:%d, cfp:%d, cfc:%d\n"
           "inte:%d, interrupt_pending:%d, interrupt_opcode:" u8 "\n"
-          "halted: %d\n"
-          "cycle_count:%" PRIu64 "\n",
+          "halted: %d\n",
           cpu->ra, cpu->rb, cpu->rc, cpu->rd, cpu->re, cpu->rh, cpu->rl,
           get_rbc(), get_rde(), get_rhl(), cpu->pc, cpu->sp, cpu->cfs, cpu->cfz,
           cpu->cfa, cpu->cfp, cpu->cfc, cpu->inte, cpu->interrupt_pending,
-          cpu->interrupt_opcode, cpu->halted, cpu->cycle_count);
+          cpu->interrupt_opcode, cpu->halted);
 #undef u8
 #undef u16
 }
@@ -286,14 +290,14 @@ static inline void op_call_cond(adc_8080_cpu *cpu, uint16_t addr,
                                 bool condition) {
   if (condition) {
     op_call(cpu, addr);
-    cpu->cycle_count += 6;
+    cpu->cycles += 6;
   }
 }
 
 static inline void op_ret_cond(adc_8080_cpu *cpu, bool condition) {
   if (condition) {
     cpu->pc = stack_pop(cpu);
-    cpu->cycle_count += 6;
+    cpu->cycles += 6;
   }
 }
 
@@ -381,7 +385,7 @@ static void op_daa(adc_8080_cpu *cpu) {
 }
 
 static void exec_next(adc_8080_cpu *cpu, uint8_t opcode) {
-  cpu->cycle_count += s_cycles_lut[opcode];
+  cpu->cycles = s_cycles_lut[opcode];
 
   if (cpu->interrupt_delay)
     cpu->interrupt_delay = false;

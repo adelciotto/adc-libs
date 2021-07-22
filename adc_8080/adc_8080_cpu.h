@@ -14,8 +14,8 @@
 #endif
 
 #define ADC_8080_CPU_VERSION_MAJOR 0
-#define ADC_8080_CPU_VERSION_MINOR 3
-#define ADC_8080_CPU_VERSION_PATCH 1
+#define ADC_8080_CPU_VERSION_MINOR 4
+#define ADC_8080_CPU_VERSION_PATCH 0
 
 typedef struct {
   // 7 8-bit registers (accum and scratch).
@@ -37,8 +37,8 @@ typedef struct {
   uint8_t interrupt_opcode;
   bool interrupt_delay;
 
-  // Cycles the cpu has consumed.
-  uint64_t cycle_count;
+  // Cycles the cpu has consumed in the latest step.
+  uint64_t cycles;
 
   // Custom user data for function handlers.
   void *userdata;
@@ -60,7 +60,9 @@ extern "C" {
 void adc_8080_cpu_init(adc_8080_cpu *cpu);
 
 // adc_8080_cpu_step() - Decode and execute the next instruction.
-void adc_8080_cpu_step(adc_8080_cpu *cpu);
+//
+// Returns the number of cycles consumed from this step.
+uint64_t adc_8080_cpu_step(adc_8080_cpu *cpu);
 
 // adc_8080_cpu_interrupt() - Request an interrupt with the given opcode.
 void adc_8080_cpu_interrupt(adc_8080_cpu *cpu, uint8_t opcode);

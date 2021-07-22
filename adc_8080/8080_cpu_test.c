@@ -93,17 +93,18 @@ static void run_test(adc_8080_cpu *cpu, const char *filename,
   }
 
   // Run the test.
+  uint64_t cycle_count = 0;
   while (!s_test_complete)
-    adc_8080_cpu_step(cpu);
+    cycle_count += adc_8080_cpu_step(cpu);
 
-  int64_t diff = llabs(expected_cycles - cpu->cycle_count);
+  int64_t diff = llabs(expected_cycles - cycle_count);
   if (diff > 0) {
     fprintf(stderr,
             "\n\n##### Test '%s' failed!\n"
             "Error: Cycles consumed does not match expected! Expected: "
             "%lld, actual: "
             "%lld\n",
-            filename, expected_cycles, cpu->cycle_count);
+            filename, expected_cycles, cycle_count);
     return;
   }
 
