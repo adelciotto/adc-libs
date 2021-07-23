@@ -1,6 +1,6 @@
 // adc_argp command-line argument parsing library by Anthony Del Ciotto.
 
-#ifndef _ADC_ARGP_H
+#ifndef _ADC_ARGP_H_
 #define _ADC_ARGP_H_
 
 #include <stdio.h> // For FILE*
