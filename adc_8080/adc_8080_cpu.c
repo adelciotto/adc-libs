@@ -128,7 +128,7 @@ void adc_8080_cpu_init(adc_8080_cpu *cpu) {
   }
 }
 
-uint64_t adc_8080_cpu_step(adc_8080_cpu *cpu) {
+int adc_8080_cpu_step(adc_8080_cpu *cpu) {
   assert(cpu);
   assert(cpu->read_byte);
   assert(cpu->write_byte);
@@ -155,7 +155,7 @@ uint64_t adc_8080_cpu_step(adc_8080_cpu *cpu) {
   }
 
   // Reset the cycle count and return the consumed cycles this step.
-  uint64_t cycles = cpu->cycles;
+  int cycles = cpu->cycles;
   cpu->cycles = 0;
   return cycles;
 }

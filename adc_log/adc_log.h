@@ -59,12 +59,12 @@ enum { ADC_LOG_DEBUG, ADC_LOG_INFO, ADC_LOG_WARN, ADC_LOG_ERROR };
 // A struct which represents a log message. Passed to all callbacks.
 typedef struct {
   const char *fmt;
-  va_list args;
   const char *file;
-  struct tm *time;
-  void *userdata;
   int line;
   int level;
+  va_list args;
+  struct tm *time;
+  void *userdata;
 } adc_log_msg;
 
 typedef void (*adc_log_lock_handler)(int lock, void *userdata);
@@ -129,12 +129,9 @@ static struct {
   void *userdata;
   adc_log_lock_handler lock_handler;
   int level;
-  adc_log_callback callbacks[ADC_LOG_MAX_CALLBACKS];
   int num_callbacks;
-} s_logger = {.userdata = NULL,
-              .lock_handler = NULL,
-              .level = ADC_LOG_DEBUG,
-              .num_callbacks = 0};
+  adc_log_callback callbacks[ADC_LOG_MAX_CALLBACKS];
+} s_logger = {NULL, NULL, ADC_LOG_DEBUG, 0};
 
 static const char *s_level_strings[] = {"DEBUG", "INFO", "WARN", "ERROR"};
 
@@ -193,7 +190,7 @@ static void unlock() {
 }
 
 void adc__log(int level, const char *file, int line, const char *fmt, ...) {
-  adc_log_msg msg = {.fmt = fmt, .file = file, .line = line, .level = level};
+  adc_log_msg msg = {fmt, file, line, level};
 
   lock();
 

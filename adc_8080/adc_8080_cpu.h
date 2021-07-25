@@ -13,9 +13,10 @@
 #include <stdbool.h> // For the bool type
 #endif
 
+// 0.4.1
 #define ADC_8080_CPU_VERSION_MAJOR 0
 #define ADC_8080_CPU_VERSION_MINOR 4
-#define ADC_8080_CPU_VERSION_PATCH 0
+#define ADC_8080_CPU_VERSION_PATCH 1
 
 typedef struct {
   // 7 8-bit registers (accum and scratch).
@@ -38,7 +39,7 @@ typedef struct {
   bool interrupt_delay;
 
   // Cycles the cpu has consumed in the latest step.
-  uint64_t cycles;
+  int cycles;
 
   // Custom user data for function handlers.
   void *userdata;
@@ -62,7 +63,7 @@ void adc_8080_cpu_init(adc_8080_cpu *cpu);
 // adc_8080_cpu_step() - Decode and execute the next instruction.
 //
 // Returns the number of cycles consumed from this step.
-uint64_t adc_8080_cpu_step(adc_8080_cpu *cpu);
+int adc_8080_cpu_step(adc_8080_cpu *cpu);
 
 // adc_8080_cpu_interrupt() - Request an interrupt with the given opcode.
 void adc_8080_cpu_interrupt(adc_8080_cpu *cpu, uint8_t opcode);
